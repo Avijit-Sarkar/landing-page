@@ -814,6 +814,7 @@ body {
   display: flex;
   gap: 16px;
   margin-top: 24px;
+  flex-wrap: wrap;
 }
 
 .social-link {
