@@ -1,0 +1,20 @@
+
+Options -MultiViews
+RewriteEngine On
+RewriteBase /
+
+# Handle 404
+ErrorDocument 404 /404.html
+
+# If the request is not a directory, and not a file
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+# And if adding .html makes it a file (legacy support or root files)
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.*)$ $1.html [L]
+
+# For trailing slash directories (Next.js default with trailingSlash: true)
+# If request doesn't end in slash, and is a directory, add slash
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteCond %{REQUEST_URI} !/$
+RewriteRule ^(.*)$ $1/ [L,R=301]

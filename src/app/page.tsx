@@ -632,13 +632,13 @@ export default function LandingPage() {
                   <a href="#">Help Center</a>
                 </li>
                 <li>
-                  <a href="#">Contact</a>
+                  <a href="/contact">Contact</a>
                 </li>
                 <li>
-                  <a href="#">Privacy</a>
+                  <a href="/privacy">Privacy</a>
                 </li>
                 <li>
-                  <a href="#">Terms</a>
+                  <a href="/terms">Terms</a>
                 </li>
               </ul>
             </div>
