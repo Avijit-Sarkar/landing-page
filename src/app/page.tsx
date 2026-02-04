@@ -1,75 +1,111 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import Navbar from "@/components/Navbar";
 
 export default function LandingPage() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const [typedText, setTypedText] = useState("");
+  const fullText = "Watch & Earn Online";
+  const typingRef = useRef<NodeJS.Timeout | null>(null);
+  // Default to localhost for development testing
+  const PDF_LINK = "http://localhost:5000/api/public/landing-pdf";
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setShowBackToTop(window.scrollY > 500);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  // Typing effect
+  useEffect(() => {
+    let currentIndex = 0;
+    const typeNextChar = () => {
+      if (currentIndex <= fullText.length) {
+        setTypedText(fullText.slice(0, currentIndex));
+        currentIndex++;
+        typingRef.current = setTimeout(typeNextChar, 100);
+      } else {
+        // Reset and repeat after delay
+        setTimeout(() => {
+          currentIndex = 0;
+          typeNextChar();
+        }, 3000);
+      }
+    };
+    typeNextChar();
+    return () => {
+      if (typingRef.current) clearTimeout(typingRef.current);
+    };
+  }, []);
+
+  // Scroll reveal effect
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: "0px 0px -50px 0px",
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("active");
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll(".reveal").forEach((el) => {
+      observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
+      <Navbar />
+
       {/* Animated Background */}
       <div className="animated-bg" />
 
-      {/* Navbar */}
-      <nav className={`navbar ${isScrolled ? "scrolled" : ""}`}>
-        <a href="#">
-          <div className="logo">
-            <img
-              src="/logo.jpg"
-              alt="Global Video Logo"
-              width="36"
-              height="36"
-              className="rounded-full"
-            />
-            Global Video
-          </div>
-        </a>
-
-        <ul className="nav-links">
-          <li>
-            <a href="#features">Features</a>
-          </li>
-          <li>
-            <a href="#how-it-works">How It Works</a>
-          </li>
-          <li>
-            <a href="#testimonials">Testimonials</a>
-          </li>
-        </ul>
-
-        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-          {/* <a href="#" className="btn-secondary" style={{ padding: "12px 24px" }}>
-            Sign In
-          </a> */}
-          <a href="#" className="btn-primary" style={{ padding: "12px 24px" }}>
-            Get Started
-          </a>
-        </div>
-
-        <button
-          className="mobile-menu-btn"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? "✕" : "☰"}
-        </button>
-      </nav>
+      {/* Floating Particles */}
+      <div className="particles">
+        {[...Array(10)].map((_, i) => (
+          <div key={i} className="particle" />
+        ))}
+      </div>
 
       {/* Hero Section */}
       <section className="hero">
+        {/* Animated Orbs */}
+        <div className="hero-orb hero-orb-1" />
+        <div className="hero-orb hero-orb-2" />
+        <div className="hero-orb hero-orb-3" />
+
+        {/* Floating Elements */}
         <div className="floating-element floating-element-1" />
         <div className="floating-element floating-element-2" />
         <div className="floating-element floating-element-3" />
+        <div className="floating-element floating-element-4" />
 
         <div className="hero-content">
+          <div className="hero-badge">
+            <span className="hero-badge-dot" />
+            <span>
+              {typedText}
+              <span style={{ opacity: 0.5 }}>|</span>
+            </span>
+          </div>
+
           <h1 className="hero-title">
             Stream <span className="gradient-text">Global Videos</span>
             <br />
@@ -79,23 +115,41 @@ export default function LandingPage() {
           <p className="hero-description">
             Discover millions of videos from around the world. Experience
             crystal-clear streaming, personalized recommendations, and seamless
-            playback on any device.
+            playback on any device — all while earning rewards.
           </p>
 
           <div className="hero-buttons">
-            <a href="#" className="btn-primary">
+            <a
+              href="https://play.google.com/store/apps/details?id=com.dogibiy432.globalvideo"
+              className="btn-primary"
+              target="_blank"
+            >
+              <img
+                src="/google-play.png"
+                alt="Google Play"
+                width="24"
+                height="24"
+                className="drop-shadow-lg"
+              />
+              Download Now
+            </a>
+            <a
+              href={PDF_LINK}
+              className="btn-secondary"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Learn More
               <svg
                 width="20"
                 height="20"
                 viewBox="0 0 24 24"
-                fill="currentColor"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
               >
-                <path d="M8 5v14l11-7z" />
+                <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
-              Coming Soon
-            </a>
-            <a href="#how-it-works" className="btn-secondary">
-              Learn More →
             </a>
           </div>
 
@@ -119,14 +173,16 @@ export default function LandingPage() {
       {/* Features Section */}
       <section id="features" className="section">
         <div className="container">
-          <h2 className="section-title">Powerful Features</h2>
-          <p className="section-subtitle">
+          <div className="section-badge reveal">✨ Premium Features</div>
+          <h2 className="section-title reveal">Powerful Features</h2>
+          <p className="section-subtitle reveal">
             Everything you need for the ultimate video streaming experience, all
-            in one place.
+            in one premium platform.
           </p>
 
           <div className="features-grid">
-            <div className="glass-card feature-card">
+            <div className="glass-card feature-card reveal">
+              <div className="glass-card-glow" />
               <div className="feature-icon feature-icon-1">🎬</div>
               <h3 className="feature-title">4K Ultra HD Streaming</h3>
               <p className="feature-description">
@@ -135,7 +191,8 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="glass-card feature-card">
+            <div className="glass-card feature-card reveal">
+              <div className="glass-card-glow" />
               <div className="feature-icon feature-icon-2">🤖</div>
               <h3 className="feature-title">AI Recommendations</h3>
               <p className="feature-description">
@@ -144,7 +201,8 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="glass-card feature-card">
+            <div className="glass-card feature-card reveal">
+              <div className="glass-card-glow" />
               <div className="feature-icon feature-icon-3">📱</div>
               <h3 className="feature-title">Multi-Device Sync</h3>
               <p className="feature-description">
@@ -153,7 +211,8 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="glass-card feature-card">
+            <div className="glass-card feature-card reveal">
+              <div className="glass-card-glow" />
               <div className="feature-icon feature-icon-4">⚡</div>
               <h3 className="feature-title">Lightning Fast</h3>
               <p className="feature-description">
@@ -162,16 +221,18 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="glass-card feature-card">
-              <div className="feature-icon feature-icon-5">🔒</div>
-              <h3 className="feature-title">Privacy First</h3>
+            <div className="glass-card feature-card reveal">
+              <div className="glass-card-glow" />
+              <div className="feature-icon feature-icon-5">💰</div>
+              <h3 className="feature-title">Earn While Watching</h3>
               <p className="feature-description">
-                Your viewing history stays private. We use end-to-end encryption
-                to protect your data and preferences.
+                Get rewarded for every video you watch. Accumulate coins and
+                redeem them for real-world rewards.
               </p>
             </div>
 
-            <div className="glass-card feature-card">
+            <div className="glass-card feature-card reveal">
+              <div className="glass-card-glow" />
               <div className="feature-icon feature-icon-6">🌍</div>
               <h3 className="feature-title">Global Content</h3>
               <p className="feature-description">
@@ -186,7 +247,7 @@ export default function LandingPage() {
       {/* Video Showcase Section */}
       <section className="section" style={{ paddingTop: 0 }}>
         <div className="container">
-          <div className="video-showcase">
+          <div className="video-showcase reveal">
             <iframe
               width="100%"
               style={{ aspectRatio: "16/9", border: "none" }}
@@ -203,37 +264,41 @@ export default function LandingPage() {
       {/* How It Works Section */}
       <section id="how-it-works" className="section">
         <div className="container">
-          <h2 className="section-title">How It Works</h2>
-          <p className="section-subtitle">
+          <div className="section-badge reveal">🚀 Simple Steps</div>
+          <h2 className="section-title reveal">How It Works</h2>
+          <p className="section-subtitle reveal">
             Get started in just three simple steps and unlock a world of
-            entertainment.
+            entertainment and rewards.
           </p>
 
           <div className="steps-container">
-            <div className="glass-card step-card">
+            <div className="glass-card step-card reveal">
+              <div className="glass-card-glow" />
               <div className="step-number">1</div>
               <h3 className="step-title">Create Your Account</h3>
               <p className="step-description">
-                Sign up in seconds with your email or social accounts. No credit
-                card required to start.
+                Sign up in seconds with your mobile number. No credit card
+                required to start your journey.
               </p>
             </div>
 
-            <div className="glass-card step-card">
+            <div className="glass-card step-card reveal">
+              <div className="glass-card-glow" />
               <div className="step-number">2</div>
-              <h3 className="step-title">Verify your Account</h3>
+              <h3 className="step-title">Verify Your Account</h3>
               <p className="step-description">
-                Verify your account, get membership. Account activation in
-                fraction of second.
+                Quick verification gets you premium access. Account activation
+                happens in a fraction of a second.
               </p>
             </div>
 
-            <div className="glass-card step-card">
+            <div className="glass-card step-card reveal">
+              <div className="glass-card-glow" />
               <div className="step-number">3</div>
-              <h3 className="step-title">Start getting rewards</h3>
+              <h3 className="step-title">Start Earning Rewards</h3>
               <p className="step-description">
-                Dive into millions of videos. Watch anywhere, anytime & get
-                unlimited reward.
+                Dive into millions of videos. Watch anywhere, anytime & earn
+                unlimited rewards for your engagement.
               </p>
             </div>
           </div>
@@ -243,18 +308,27 @@ export default function LandingPage() {
       {/* Testimonials Section */}
       <section id="testimonials" className="section">
         <div className="container">
-          <h2 className="section-title">What People Say</h2>
-          <p className="section-subtitle">
+          <div className="section-badge reveal">💬 User Stories</div>
+          <h2 className="section-title reveal">What People Say</h2>
+          <p className="section-subtitle reveal">
             Join millions of satisfied users who have transformed their viewing
-            experience.
+            experience and started earning.
           </p>
 
           <div className="testimonials-grid">
-            <div className="glass-card testimonial-card">
+            <div className="glass-card testimonial-card reveal">
+              <div className="glass-card-glow" />
+              <div className="testimonial-stars">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className="testimonial-star">
+                    ★
+                  </span>
+                ))}
+              </div>
               <p className="testimonial-text">
                 Global Video has completely changed how I discover content. The
                 recommendations are spot-on, and the streaming quality is
-                absolutely incredible. Best platform I&apos;ve ever used!
+                absolutely incredible. Plus, I earn while watching!
               </p>
               <div className="testimonial-author">
                 <div className="author-avatar">SK</div>
@@ -265,7 +339,15 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="glass-card testimonial-card">
+            <div className="glass-card testimonial-card reveal">
+              <div className="glass-card-glow" />
+              <div className="testimonial-stars">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className="testimonial-star">
+                    ★
+                  </span>
+                ))}
+              </div>
               <p className="testimonial-text">
                 As a filmmaker, I appreciate the 4K quality and global reach. My
                 short films have found audiences I never could have reached on
@@ -276,7 +358,7 @@ export default function LandingPage() {
                   className="author-avatar"
                   style={{
                     background:
-                      "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+                      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                   }}
                 >
                   MP
@@ -288,11 +370,19 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="glass-card testimonial-card">
+            <div className="glass-card testimonial-card reveal">
+              <div className="glass-card-glow" />
+              <div className="testimonial-stars">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className="testimonial-star">
+                    ★
+                  </span>
+                ))}
+              </div>
               <p className="testimonial-text">
-                The cross-device sync is a game-changer. I start a documentary
-                on my commute and finish it on my smart TV at home. Seamless
-                experience every single time.
+                The earning feature is amazing! I watch videos during my commute
+                and have accumulated significant rewards. It&apos;s
+                entertainment and income combined.
               </p>
               <div className="testimonial-author">
                 <div
@@ -314,156 +404,47 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      {/* <section id="pricing" className="section">
-        <div className="container">
-          <h2 className="section-title">Simple Pricing</h2>
-          <p className="section-subtitle">
-            Choose the plan that works for you. Upgrade or downgrade anytime.
-          </p>
-
-          <div className="pricing-grid">
-            <div className="glass-card pricing-card">
-              <h3 className="pricing-name">Free</h3>
-              <div className="pricing-price">
-                $0<span>/month</span>
-              </div>
-              <p className="pricing-description">
-                Perfect for casual viewers
-              </p>
-              <ul className="pricing-features">
-                <li>
-                  <span className="check-icon">✓</span>
-                  720p HD Streaming
-                </li>
-                <li>
-                  <span className="check-icon">✓</span>
-                  Ad-supported content
-                </li>
-                <li>
-                  <span className="check-icon">✓</span>
-                  Basic recommendations
-                </li>
-                <li>
-                  <span className="check-icon">✓</span>
-                  1 Device at a time
-                </li>
-              </ul>
-              <a href="#" className="btn-secondary" style={{ width: "100%" }}>
-                Get Started
-              </a>
-            </div>
-
-            <div className="glass-card pricing-card featured">
-              <h3 className="pricing-name">Pro</h3>
-              <div className="pricing-price">
-                $9<span>/month</span>
-              </div>
-              <p className="pricing-description">
-                Best for enthusiasts
-              </p>
-              <ul className="pricing-features">
-                <li>
-                  <span className="check-icon">✓</span>
-                  4K Ultra HD Streaming
-                </li>
-                <li>
-                  <span className="check-icon">✓</span>
-                  Ad-free experience
-                </li>
-                <li>
-                  <span className="check-icon">✓</span>
-                  AI-powered recommendations
-                </li>
-                <li>
-                  <span className="check-icon">✓</span>
-                  4 Devices simultaneously
-                </li>
-                <li>
-                  <span className="check-icon">✓</span>
-                  Offline downloads
-                </li>
-              </ul>
-              <a href="#" className="btn-primary" style={{ width: "100%" }}>
-                Start Free Trial
-              </a>
-            </div>
-
-            <div className="glass-card pricing-card">
-              <h3 className="pricing-name">Enterprise</h3>
-              <div className="pricing-price">
-                $29<span>/month</span>
-              </div>
-              <p className="pricing-description">
-                For teams & businesses
-              </p>
-              <ul className="pricing-features">
-                <li>
-                  <span className="check-icon">✓</span>
-                  Everything in Pro
-                </li>
-                <li>
-                  <span className="check-icon">✓</span>
-                  Unlimited team members
-                </li>
-                <li>
-                  <span className="check-icon">✓</span>
-                  Advanced analytics
-                </li>
-                <li>
-                  <span className="check-icon">✓</span>
-                  Priority support
-                </li>
-                <li>
-                  <span className="check-icon">✓</span>
-                  Custom branding
-                </li>
-              </ul>
-              <a href="#" className="btn-secondary" style={{ width: "100%" }}>
-                Contact Sales
-              </a>
-            </div>
-          </div>
-        </div>
-      </section> */}
-
       {/* CTA Section */}
       <section className="section cta-section">
         <div className="container">
           <div className="cta-content">
-            <h2 className="cta-title">
+            <h2 className="cta-title reveal">
               Ready to Transform Your
               <br />
-              <span
-                className="gradient-text"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
-                Viewing Experience?
-              </span>
+              <span className="gradient-text">Viewing Experience?</span>
             </h2>
-            <p className="cta-description">
+            <p className="cta-description reveal">
               Join millions of users streaming their favorite content with
-              Global Video. Start your free journey today.
+              Global Video. Start your free journey today and begin earning
+              rewards.
             </p>
             <div
+              className="reveal"
               style={{
                 display: "flex",
-                gap: "20px",
+                gap: "24px",
                 justifyContent: "center",
                 flexWrap: "wrap",
               }}
             >
               <a
-                href="#"
+                href={PDF_LINK}
                 className="btn-primary"
-                style={{ fontSize: "1.125rem", padding: "20px 40px" }}
+                style={{ fontSize: "1.1rem", padding: "22px 48px" }}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                Get Started for Free →
+                Get Started for Free
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
               </a>
             </div>
           </div>
@@ -479,17 +460,17 @@ export default function LandingPage() {
                 <img
                   src="/logo.jpg"
                   alt="Global Video Logo"
-                  width="36"
-                  height="36"
+                  width="44"
+                  height="44"
                   className="rounded-full"
                 />
                 Global Video
               </div>
               <p>
                 Discover, stream, and share videos from around the world. Your
-                gateway to global entertainment.
+                gateway to global entertainment and rewards.
               </p>
-              <div className="social-links" style={{}}>
+              <div className="social-links">
                 <a
                   href="https://t.me/globalvideo2026"
                   className="social-link"
@@ -593,16 +574,16 @@ export default function LandingPage() {
               <h4>Product</h4>
               <ul className="footer-links">
                 <li>
-                  <a href="#">Features</a>
+                  <a href="#features">Features</a>
                 </li>
                 <li>
                   <a href="#">Pricing</a>
                 </li>
                 <li>
-                  <a href="#">Apps</a>
+                  <a href="#">Mobile App</a>
                 </li>
                 <li>
-                  <a href="#">API</a>
+                  <a href="#">Rewards</a>
                 </li>
               </ul>
             </div>
@@ -645,10 +626,30 @@ export default function LandingPage() {
           </div>
 
           <div className="footer-bottom">
-            <p>© 2025 Global Video. All rights reserved.</p>
+            <p>© 2026 Global Video. All rights reserved.</p>
           </div>
         </div>
       </footer>
+
+      {/* Back to Top Button */}
+      <button
+        className={`back-to-top ${showBackToTop ? "visible" : ""}`}
+        onClick={scrollToTop}
+        aria-label="Back to Top"
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M18 15l-6-6-6 6" />
+        </svg>
+      </button>
     </>
   );
 }

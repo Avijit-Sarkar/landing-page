@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Navbar from "@/components/Navbar";
 
 export default function TermsPage() {
   return (
@@ -9,42 +10,7 @@ export default function TermsPage() {
       <div className="animated-bg" />
 
       {/* Navbar */}
-      <nav className="navbar">
-        <Link href="/">
-          <div className="logo">
-            <img
-              src="/logo.jpg"
-              alt="Global Video Logo"
-              width="36"
-              height="36"
-              className="rounded-full"
-            />
-            Global Video
-          </div>
-        </Link>
-
-        <ul className="nav-links">
-          <li>
-            <Link href="/#features">Features</Link>
-          </li>
-          <li>
-            <Link href="/#how-it-works">How It Works</Link>
-          </li>
-          <li>
-            <Link href="/#testimonials">Testimonials</Link>
-          </li>
-        </ul>
-
-        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-          <Link
-            href="/"
-            className="btn-primary"
-            style={{ padding: "12px 24px" }}
-          >
-            Get Started
-          </Link>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Terms Content */}
       <section className="legal-section">

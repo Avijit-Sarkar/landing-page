@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import Navbar from "@/components/Navbar";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -18,9 +19,9 @@ export default function ContactPage() {
 
     // Construct mailto link
     const mailtoLink = `mailto:24x7support@globalvideo.in?subject=${encodeURIComponent(
-      formData.subject
+      formData.subject,
     )}&body=${encodeURIComponent(
-      `Name: ${formData.name}\n\n${formData.message}`
+      `Name: ${formData.name}\n\n${formData.message}`,
     )}`;
 
     // Open email client
@@ -34,7 +35,7 @@ export default function ContactPage() {
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     setFormData({
       ...formData,
@@ -48,42 +49,7 @@ export default function ContactPage() {
       <div className="animated-bg" />
 
       {/* Navbar */}
-      <nav className="navbar">
-        <Link href="/">
-          <div className="logo">
-            <img
-              src="/logo.jpg"
-              alt="Global Video Logo"
-              width="36"
-              height="36"
-              className="rounded-full"
-            />
-            Global Video
-          </div>
-        </Link>
-
-        <ul className="nav-links">
-          <li>
-            <Link href="/#features">Features</Link>
-          </li>
-          <li>
-            <Link href="/#how-it-works">How It Works</Link>
-          </li>
-          <li>
-            <Link href="/#testimonials">Testimonials</Link>
-          </li>
-        </ul>
-
-        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-          <Link
-            href="/"
-            className="btn-primary"
-            style={{ padding: "12px 24px" }}
-          >
-            Get Started
-          </Link>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Contact Content */}
       <section className="legal-section contact-section">
